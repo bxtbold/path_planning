@@ -1,0 +1,41 @@
+import math
+import numpy as np
+import random
+
+
+def get_new_point(q, q_nearest, step):
+    try:
+        vector = (np.array(q) - np.array(q_nearest)) / find_distance(q, q_nearest)
+    except Exception as e:
+        print("get_new_point: ", e)
+        return []
+    result = list(np.array(q_nearest) + vector * step)
+    return [round(i, 3) for i in result]
+
+
+def get_sample_point(domain, seed = 47):
+    # random.seed(seed)
+    return [round(random.randint(0, domain[i]), 4) for i in range(len(domain))]
+
+
+def find_distance(a, b):
+    tmp = 0
+    for i, j in zip(a, b):
+        tmp += (i - j) ** 2
+    return math.sqrt(tmp)
+
+
+def get_nearest_point(point, vertices):
+    dist = []
+    for i in vertices:
+        dist.append(find_distance(point, i))
+    m = dist.index(min(dist))
+    return vertices[m]
+
+
+def get_k_nearest_point(point, vertices, k = 1):
+    dist = []
+    for i in vertices:
+        dist.append(find_distance(point, i))
+    m = dist.index(min(dist))
+    return vertices[m]
