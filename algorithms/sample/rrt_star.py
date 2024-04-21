@@ -1,5 +1,5 @@
 from algorithms.sample.tree import Tree
-from utils.point import find_distance, get_nearest_point, get_sample_point, steer, get_k_nearest_point
+from utils.point import find_distance, get_nearest_point, get_sample_point, get_k_nearest_point, get_new_point
 from utils.plot import *
 
 
@@ -76,4 +76,4 @@ class RRTStar:
         return get_k_nearest_point(vertex, self.tree.vertices, k)
 
     def steer(self, q, q_nearest):
-        return steer(q, q_nearest, self.step)
+        return get_new_point(q, q_nearest, self.step)
