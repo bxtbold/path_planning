@@ -1,4 +1,7 @@
+import time
+
 from algorithms.sample.rrt import RRT
+from algorithms.sample.rrt_star import RRTStar
 from utils.plot import *
 from utils.point import *
 
@@ -21,7 +24,7 @@ def random_obstacles(domain):
 if __name__ == "__main__":
     k = 1000
     step = 5
-    domain = (100, 100)  # (100, 100)
+    domain = (100, 100)  # (100, 100, 100)
     # obstacles = random_obstacles(domain)
     obstacles = []
 
@@ -32,7 +35,8 @@ if __name__ == "__main__":
     #     q_init = get_sample_point(domain)
     #     q_target = get_sample_point(domain)
 
-    rrt = RRT()
+    # rrt = RRT()
+    rrt = RRTStar()
     rrt.set_attributes(q_init, q_target, domain, k, step, obstacles)
     path = rrt.plan()
 
@@ -52,12 +56,15 @@ if __name__ == "__main__":
         scatter(ax, q_target, 15, 'blue')
 
         # draw a graph
+        last_updated_time = 0
         for q1, q2 in rrt.tree.edges:
             plot(ax, q1, q2)
-            pause(1 / 10 ** (len(q1) * 2))
+            if time.time() - last_updated_time > 0.5:
+                pause(1 / 10 ** (len(q1) * 3))
+                last_updated_time = time.time()
+            time.sleep(0.01)
 
         # draw a path
         for q1, q2 in path:
             plot(ax, q1, q2, "red", "red")
-            pause(1 / 10 ** (len(q1) * 2))
         pause(5)

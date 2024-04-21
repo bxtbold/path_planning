@@ -34,8 +34,18 @@ def get_nearest_point(point, vertices):
 
 
 def get_k_nearest_point(point, vertices, k = 1):
+    if k < 1:
+        return []
+
     dist = []
-    for i in vertices:
-        dist.append(find_distance(point, i))
-    m = dist.index(min(dist))
-    return vertices[m]
+    for i in range(len(vertices)):
+        d = find_distance(vertices[i], point)
+        dist.append((d, i))
+
+    sorted_array = sorted(dist, key=lambda x: x[0])
+
+    k_neighbors = []
+    for d, i in sorted_array[:k]:
+        k_neighbors.append(vertices[i])
+
+    return k_neighbors
