@@ -4,9 +4,13 @@ from algorithms.sample.rrt import RRT
 from algorithms.sample.rrt_star import RRTStar
 from utils.plot import *
 from utils.point import *
+from utils.config_parser import load_configs
 
 
-should_plot = True
+PLANNERS = {
+    "RRT": RRT(),
+    "RRTStar": RRTStar()
+}
 
 
 def random_obstacles(domain):
@@ -22,29 +26,27 @@ def random_obstacles(domain):
 
 
 if __name__ == "__main__":
-    k = 1000
-    step = 5
-    domain = (100, 100)  # (100, 100, 100)
-    # obstacles = random_obstacles(domain)
-    obstacles = []
+    configs = load_configs()
+    planner_name = configs["planner"]
+    k = configs["k"]
+    step = configs["step"]
+    domain = [configs["domain"]] * configs["dimensions"]  # (100, 100, 100)
+    obstacles = random_obstacles(domain) if configs["use_obstacle"] else []
+    should_plot = configs["should_visualize"]
 
     # get collision free start and end configs
-    q_init = get_sample_point(domain)
-    q_target = get_sample_point(domain)
-    # while not is_collision_free(q_init, obstacles) and not is_collision_free(q_target, obstacles):
-    #     q_init = get_sample_point(domain)
-    #     q_target = get_sample_point(domain)
+    q_init = get_sample_point(domain, obstacles)
+    q_target = get_sample_point(domain, obstacles)
 
-    # rrt = RRT()
-    rrt = RRTStar()
-    rrt.set_attributes(q_init, q_target, domain, k, step, obstacles)
-    path = rrt.plan()
+    planner = PLANNERS[planner_name]
+    planner.set_attributes(q_init, q_target, domain, k, step, obstacles)
+    path = planner.plan()
 
     print("path: ", path)
 
     if should_plot and len(path) > 0:
         ax = init_plot(domain) if should_plot else None
-        plt.title(f"RRT planner {len(rrt.tree.edges)} steps")
+        plt.title(f"{planner_name} {len(planner.tree.edges)} steps")
 
         if len(obstacles) > 0:
             # draw obstacles
@@ -57,7 +59,7 @@ if __name__ == "__main__":
 
         # draw a graph
         last_updated_time = 0
-        for q1, q2 in rrt.tree.edges:
+        for q1, q2 in planner.tree.edges:
             plot(ax, q1, q2)
             if time.time() - last_updated_time > 0.5:
                 pause(1 / 10 ** (len(q1) * 3))

@@ -13,8 +13,8 @@ def get_new_point(q, q_nearest, step):
     return [round(i, 3) for i in result]
 
 
-def get_sample_point(domain, seed = 47):
-    # random.seed(seed)
+def get_sample_point(domain, obstacles = []):
+    # TODO: check if the sample is free of obstacles
     return [round(random.randint(0, domain[i]), 4) for i in range(len(domain))]
 
 
