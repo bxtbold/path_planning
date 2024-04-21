@@ -9,7 +9,7 @@ from utils.config_parser import load_configs
 
 PLANNERS = {
     "RRT": RRT(),
-    "RRTStar": RRTStar()
+    "RRT*": RRTStar()
 }
 
 
@@ -59,9 +59,10 @@ if __name__ == "__main__":
 
         # draw a graph
         last_updated_time = 0
+        pause(10)
         for q1, q2 in planner.tree.edges:
             plot(ax, q1, q2)
-            if time.time() - last_updated_time > 0.5:
+            if time.time() - last_updated_time > 0.1:
                 pause(1 / 10 ** (len(q1) * 3))
                 last_updated_time = time.time()
             time.sleep(0.01)
