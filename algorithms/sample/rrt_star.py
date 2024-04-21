@@ -1,6 +1,5 @@
 from algorithms.sample.tree import Tree
-from utils.point import find_distance, get_nearest_point, get_sample_point, get_k_nearest_point, get_new_point
-from utils.plot import *
+from utils import point
 
 
 class RRTStar:
@@ -31,7 +30,6 @@ class RRTStar:
     def traverse_k_times(self, k):
         result = False
         i = 0
-        # distance = find_distance(self.q_init, self.q_target)
         while i < k:
             i += 1
             # sample a new config
@@ -40,25 +38,24 @@ class RRTStar:
             costs = []
             for each_nearest in q_k_nearest:
                 q_new = self.steer(q_random, each_nearest)
-                cost = find_distance(q_new, each_nearest) + find_distance(self.q_init, each_nearest)
+                cost = point.find_distance(q_new, each_nearest) + point.find_distance(self.q_init, each_nearest)
                 costs.append(cost)
 
             q_nearest = q_k_nearest[costs.index(min(costs))]
             q_new = self.steer(q_random, q_nearest)
 
-            if find_distance(q_new, self.q_target) < self.step:
+            if point.find_distance(q_new, self.q_target) < self.step:
                 self.update_tree(q_nearest, self.q_target)
                 result = True
                 break
             else:
                 self.update_tree(q_nearest, q_new)
 
-
         return result
 
     def is_collision_free(self, q):
         for origin, radius in zip(self.obstacles[0], self.obstacles[1]):
-            if find_distance(q, origin) > radius:
+            if point.find_distance(q, origin) > radius:
                 return False
         return True
 
@@ -67,13 +64,13 @@ class RRTStar:
         self.tree.add_edge([q_nearest, q_new])
 
     def get_sample_vertex(self):
-        return get_sample_point(self.domain)
+        return point.get_sample_point(self.domain)
 
     def get_nearest_neighbor(self, vertex):
-        return get_nearest_point(vertex, self.tree.vertices)
+        return point.get_nearest_point(vertex, self.tree.vertices)
 
     def get_k_nearest_neighbors(self, vertex, k):
-        return get_k_nearest_point(vertex, self.tree.vertices, k)
+        return point.get_k_nearest_point(vertex, self.tree.vertices, k)
 
     def steer(self, q, q_nearest):
-        return get_new_point(q, q_nearest, self.step)
+        return point.get_new_point(q, q_nearest, self.step)

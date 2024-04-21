@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 from mpl_toolkits.mplot3d import Axes3D
 
 
@@ -61,3 +62,31 @@ def pause(duration):
         plt.pause(duration)
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
+
+
+def draw_path(planner_name, planner, path, frame_update: int = 0.5):
+    ax = init_plot(planner.domain)
+    plt.title(f"{planner_name} {len(planner.tree.edges)} steps")
+
+    if len(planner.obstacles) > 0:
+        # draw planner
+        draw_obstacle = draw_sphere if len(planner.domain) == 3 else draw_circle
+        for origin, radius in zip(planner.obstacles[0], planner.obstacles[1]):
+            draw_obstacle(ax, radius, origin)
+
+    scatter(ax, planner.q_init, 15, 'green')
+    scatter(ax, planner.q_target, 15, 'blue')
+
+    # draw a graph
+    last_updated_time = 0
+
+    for q1, q2 in planner.tree.edges:
+        plot(ax, q1, q2)
+        if time.time() - last_updated_time > frame_update:
+            pause(1 / 10 ** (len(q1) * 4))
+            last_updated_time = time.time()
+        time.sleep(0.01)
+
+    # draw a path
+    for q1, q2 in path:
+        plot(ax, q1, q2, "red", "red")
