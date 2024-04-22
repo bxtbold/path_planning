@@ -88,5 +88,6 @@ def draw_path(planner_name, planner, path, frame_update: int = 0.5):
         time.sleep(0.01)
 
     # draw a path
-    for q1, q2 in path:
-        plot(ax, q1, q2, "red", "red")
+    if len(path) < len(planner.tree.edges):
+        for q1, q2 in path:
+            plot(ax, q1, q2, "red", "red")
