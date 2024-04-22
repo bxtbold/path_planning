@@ -1,3 +1,5 @@
+import time
+
 class Tree:
     edges: list = []
     vertices: list = []
@@ -16,8 +18,10 @@ class Tree:
         self.vertices.clear()
 
     def get_path(self, start, end):
+        # TODO: improve local planning (use djikstra instead)
         path = []
         current_vertex = end
+        start = time.time()
         while current_vertex != start:
             for edge in self.edges:
                 if edge[1] == current_vertex:

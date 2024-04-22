@@ -1,10 +1,11 @@
 import numpy as np
 
-from algorithms.sample import rrt, rrt_star
+from algorithms.sample import rrt, rrt_star, prm
 from utils import plot, point, config_parser
 
 
 PLANNERS = {
+    "PRM": prm.PRM(),
     "RRT": rrt.RRT(),
     "RRT*": rrt_star.RRTStar()
 }
