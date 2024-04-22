@@ -29,7 +29,5 @@ class Tree:
                     path.append((q1, q2))
                     current_vertex = q1
                     break
-            if time.time() - start > 3:
-                return []
         path.reverse()
         return path
