@@ -1,5 +1,5 @@
 path_planning:
-  planner: RRT*  # Options: RRT, RRT*
+  planner: RRT*  # Options: RRT, RRT*, PRM
   dimensions: 2   # Options: 2 and 3
   domain: 50    # The length of domain for each dimension. 2 dimension: (50, 50) and 3 dimension (50, 50, 50)
   k: 1000
