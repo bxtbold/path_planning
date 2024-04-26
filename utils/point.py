@@ -2,6 +2,8 @@ import math
 import numpy as np
 import random
 
+np.seterr(divide='ignore', invalid='ignore')
+
 
 def get_new_point(q, q_nearest, step):
     try:

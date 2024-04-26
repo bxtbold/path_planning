@@ -1,4 +1,4 @@
-from algorithms.sample.tree import Tree
+from algorithms.sample.tree import Tree, TreeNode
 from utils import point
 
 
@@ -11,64 +11,68 @@ class RRT:
     step: int = 1
     obstacles: list = [[], []]
 
-    def set_attributes(self, q_init, q_target, domain, k, step, obstacles = [[], []]):
-        self.tree = Tree(q_init)
-        self.q_init = q_init
-        self.q_target = q_target
+    def set_attributes(self, domain, step, obstacles = [[], []]):
+        self.tree = Tree()
         self.domain = domain
-        self.k = k
         self.step = step
         self.obstacles = obstacles
 
-    def plan(self):
-        if self.traverse_k_times(self.k):
+    def plan(self, q_init, q_target, k = 1000):
+        if isinstance(q_init, list) and isinstance(q_target, list):
+            q_init = TreeNode(q_init)
+            q_target = TreeNode(q_target)
+
+        if self.rrt(q_init, q_target, k):
             print("Solution found.")
-            return self.tree.get_path(self.q_init, self.q_target)
-        print(f"No solution found in {self.k} steps :(")
+            return self.tree.get_path(q_init, q_target)
+        print(f"No solution found in {k} steps :(")
         return []
 
-    def traverse_k_times(self, k):
+    def rrt(self, q_init, q_target, k = 1000):
         result = False
+        self.tree.add_node(q_init)
         i = 0
-        distance = point.find_distance(self.q_init, self.q_target)
+        distance = point.find_distance(q_init.value, q_target.value)
         while i < k:
             i += 1
             # sample a new config
-            q_new, q_nearest = self.traverse_once()
-            # check collision
-            # if not self.is_collision_free(q_new):
-                # continue
+            q_random = self.get_sample_node()
+            q_nearest = self.get_nearest_neighbor(q_random)
+            q_new = self.steer(q_random, q_nearest)
+            # add the new config to the tree
+            self.update_tree(q_nearest, q_new)
             # check if the new config is close to target
-            distance = point.find_distance(q_new, self.q_target)
+            distance = point.find_distance(q_new.value, q_target.value)
             if distance < self.step:
-                self.update_tree(q_nearest, self.q_target)
+                self.update_tree(q_nearest, q_target)
                 result = True
-                break
 
         return result
 
-    def traverse_once(self):
-        q_random = self.get_sample_vertex()
-        q_nearest = self.get_nearest_neighbor(q_random)
-        q_new = self.steer(q_random, q_nearest)
-        self.update_tree(q_nearest, q_new)
-        return q_new, q_nearest
-
-    def is_collision_free(self, q):
-        for origin, radius in zip(self.obstacles[0], self.obstacles[1]):
-            if point.find_distance(q, origin) > radius:
-                return False
-        return True
-
     def update_tree(self, q_nearest, q_new):
-        self.tree.add_vertex(q_new)
-        self.tree.add_edge([q_nearest, q_new])
+        self.tree.add_node(q_new)
+        self.tree.add_edge(q_nearest, q_new)
 
-    def get_sample_vertex(self):
-        return point.get_sample_point(self.domain)
+    def get_sample_node(self):
+        p = point.get_sample_point(self.domain)
+        return TreeNode(p)
 
-    def get_nearest_neighbor(self, vertex):
-        return point.get_nearest_point(vertex, self.tree.vertices)
+    def get_nearest_neighbor(self, target_node):
+        nearest_points = self.get_k_nearest_neighbors(target_node, 1)
+        return nearest_points[0]
+
+    def get_k_nearest_neighbors(self, target_node, k = 1):
+        dist_dict = {float("inf"): None}
+        for current_node in self.tree.nodes:
+            dist = point.find_distance(target_node.value, current_node.value)
+            dist_dict[dist] = current_node
+        if len(dist_dict) == 0:
+            return []
+        sorted_node_indices = sorted(dist_dict)
+        k_neighbors = [dist_dict[i] for i in sorted_node_indices[:k] if dist_dict[i] is not None]
+        return k_neighbors
 
     def steer(self, q, q_nearest):
-        return point.get_new_point(q, q_nearest, self.step)
+        return TreeNode(
+            value=point.get_new_point(q.value, q_nearest.value, self.step)
+        )

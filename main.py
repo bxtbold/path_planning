@@ -40,10 +40,10 @@ if __name__ == "__main__":
 
     # plan
     planner = PLANNERS[planner_name]
-    planner.set_attributes(q_init, q_target, domain, k, step, obstacles)
-    path = planner.plan()
+    planner.set_attributes(domain, step, obstacles)
+    path = planner.plan(q_init, q_target, k)
 
     # visualize
-    if should_plot and len(path) > 0:
-        plot.draw_path(planner_name, planner, path, frame_update)
-        plot.pause(5)
+    if should_plot:
+        plot.draw_path(q_init, q_target, planner_name, planner, path, frame_update)
+        plot.pause(10)

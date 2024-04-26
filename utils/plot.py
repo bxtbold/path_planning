@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 from mpl_toolkits.mplot3d import Axes3D
 
 
@@ -64,9 +63,8 @@ def pause(duration):
         print("KeyboardInterrupt")
 
 
-def draw_path(planner_name, planner, path, frame_update: int = 0.5):
+def draw_path(q_init, q_target, planner_name, planner, path, frame_update: int = 0.5):
     ax = init_plot(planner.domain)
-    plt.title(f"{planner_name} {len(planner.tree.edges)} steps")
 
     if len(planner.obstacles) > 0:
         # draw planner
@@ -74,20 +72,23 @@ def draw_path(planner_name, planner, path, frame_update: int = 0.5):
         for origin, radius in zip(planner.obstacles[0], planner.obstacles[1]):
             draw_obstacle(ax, radius, origin)
 
-    scatter(ax, planner.q_init, 15, 'green')
-    scatter(ax, planner.q_target, 15, 'blue')
+    scatter(ax, q_init, 15, 'green')
+    scatter(ax, q_target, 15, 'blue')
 
-    # draw a graph
-    last_updated_time = 0
+    # draw a tree
+    if hasattr(planner, "tree"):
+        plt.title(f"{planner_name} {len(planner.tree.nodes) - 2} steps")
+        for node in planner.tree.nodes:
+            for child in node.children:
+                plot(ax, node.value, child.value)
 
-    for q1, q2 in planner.tree.edges:
-        plot(ax, q1, q2)
-        if time.time() - last_updated_time > frame_update:
-            pause(1 / 10 ** (len(q1) * 4))
-            last_updated_time = time.time()
-        time.sleep(0.01)
+    elif hasattr(planner, "graph"):
+        plt.title(f"{planner_name}")
+        for node in planner.graph.nodes:
+            for child in node.neighbors:
+                plot(ax, node.value, child.value)
 
     # draw a path
-    if len(path) < len(planner.tree.edges):
-        for q1, q2 in path:
-            plot(ax, q1, q2, "red", "red")
+    for i in range(len(path)):
+        if i < len(path) - 1:
+            plot(ax, path[i].value, path[i+1].value, "red", "red")
