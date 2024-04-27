@@ -43,6 +43,10 @@ if __name__ == "__main__":
     planner.set_attributes(domain, step, obstacles)
     path = planner.plan(q_init, q_target, k)
 
+    if len(path) < 0:
+        print("No solution found :(")
+    print("Solution found.")
+
     # visualize
     if should_plot:
         plot.draw_path(q_init, q_target, planner_name, planner, path, frame_update)

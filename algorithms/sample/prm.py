@@ -21,7 +21,6 @@ class PRM:
             q_init = GraphNode(q_init)
             q_target = GraphNode(q_target)
         self.map()
-        print("Mapping done.")
         self.prm(q_init, q_target)
         return self.graph.get_path(q_init, q_target)
 

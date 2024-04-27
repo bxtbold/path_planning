@@ -23,9 +23,7 @@ class RRTStar:
             q_target = TreeNode(q_target)
 
         if self.rrt_star(q_init, q_target, k):
-            print("Solution found.")
             return self.tree.get_path(q_init, q_target)
-        print(f"No solution found in {k} steps :(")
         return []
 
     def rrt_star(self, q_init, q_target, k = 1000):
